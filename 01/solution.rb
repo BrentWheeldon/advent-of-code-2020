@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
+require "set"
+
 class Solution
-  def self.from_file(filepath)
-    new(File.read(filepath))
+  def self.from_file(filepath, count: 2)
+    new(File.read(filepath), count: count)
   end
 
-  def initialize(input)
+  def initialize(input, count: 2)
     @entries = input.lines.map(&:to_i)
+    @count = count
   end
 
   def result
@@ -15,19 +18,17 @@ class Solution
 
   private
 
-  attr_reader :entries
+  attr_reader :entries, :count
 
   def summing_entries
-    entries.each_with_index do |first_entry, first_index|
-      entries.each_with_index do |second_entry, second_index|
-        next if first_index == second_index
+    permutations = entries.permutation(count).to_set
 
-        if first_entry + second_entry == 2020
-          return [first_entry, second_entry]
-        end
+    permutations.each do |elements|
+      if elements.inject(:+) == 2020
+        return elements
       end
     end
 
-    raise RuntimeError.new("No pair of entries sum to 2020!")
+    raise RuntimeError.new("No set of #{count} entries sum to 2020!")
   end
 end
